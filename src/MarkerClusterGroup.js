@@ -196,19 +196,19 @@ export var MarkerClusterGroup = L.MarkerClusterGroup = L.FeatureGroup.extend({
 		}
 
 		var fg = this._featureGroup,
-		    npg = this._nonPointGroup,
-		    chunked = this.options.chunkedLoading,
-		    chunkInterval = this.options.chunkInterval,
-		    chunkProgress = this.options.chunkProgress,
-		    l = layersArray.length,
-		    offset = 0,
-		    originalArray = true,
-		    m;
+			npg = this._nonPointGroup,
+			chunked = this.options.chunkedLoading,
+			chunkInterval = this.options.chunkInterval,
+			chunkProgress = this.options.chunkProgress,
+			l = layersArray.length,
+			offset = 0,
+			originalArray = true,
+			m;
 
 		if (this._map) {
-			var started = (new Date()).getTime();
+			var started = Date.now();
 			var process = L.bind(function () {
-				var start = (new Date()).getTime();
+				var start = Date.now();
 
 				// Make sure to unspiderfy before starting to add some layers
 				if (this._map && this._unspiderfy) {
@@ -218,7 +218,7 @@ export var MarkerClusterGroup = L.MarkerClusterGroup = L.FeatureGroup.extend({
 				for (; offset < l; offset++) {
 					if (chunked && offset % 200 === 0) {
 						// every couple hundred markers, instrument the time elapsed since processing started:
-						var elapsed = (new Date()).getTime() - start;
+						var elapsed = Date.now() - start;
 						if (elapsed > chunkInterval) {
 							break; // been working too hard, time to take a break :-)
 						}
@@ -272,7 +272,7 @@ export var MarkerClusterGroup = L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 				if (chunkProgress) {
 					// report progress and time elapsed:
-					chunkProgress(offset, l, (new Date()).getTime() - started);
+					chunkProgress(offset, l, Date.now() - started);
 				}
 
 				// Completed processing all markers.
@@ -725,7 +725,7 @@ export var MarkerClusterGroup = L.MarkerClusterGroup = L.FeatureGroup.extend({
 		delete e.target.__dragStart;
 		if (dragStart) {
 			this._moveChild(e.target, dragStart, e.target._latlng);
-		}		
+		}
 	},
 
 
