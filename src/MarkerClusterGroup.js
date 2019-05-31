@@ -251,9 +251,10 @@ export var MarkerClusterGroup = L.MarkerClusterGroup = L.FeatureGroup.extend({
 						continue;
 					}
 
-					if (this.hasLayer(m)) {
-						continue;
-					}
+					// Above code break performance on latest chrome
+					// if (this.hasLayer(m)) {
+					// 	continue;
+					// }
 
 					this._addLayer(m, this._maxZoom);
 					if (!skipLayerAddEvent) {
@@ -313,9 +314,10 @@ export var MarkerClusterGroup = L.MarkerClusterGroup = L.FeatureGroup.extend({
 					continue;
 				}
 
-				if (this.hasLayer(m)) {
-					continue;
-				}
+				// Above code break performance on latest chrome
+				// if (this.hasLayer(m)) {
+				// 	continue;
+				// }
 
 				needsClustering.push(m);
 			}
