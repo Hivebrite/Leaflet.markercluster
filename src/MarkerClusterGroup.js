@@ -853,7 +853,8 @@ export var MarkerClusterGroup = L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	_zoomOrSpiderfy: function (e) {
 		var cluster = e.layer,
-		    bottomCluster = cluster;
+			maxSpidifiableCluster = 200,
+			bottomCluster = cluster;
 
 		while (bottomCluster._childClusters.length === 1) {
 			bottomCluster = bottomCluster._childClusters[0];
@@ -862,9 +863,23 @@ export var MarkerClusterGroup = L.MarkerClusterGroup = L.FeatureGroup.extend({
 		if (bottomCluster._zoom === this._maxZoom &&
 			bottomCluster._childCount === cluster._childCount &&
 			this.options.spiderfyOnMaxZoom) {
-
 			// All child markers are contained in a single cluster from this._maxZoom to this cluster.
-			cluster.spiderfy();
+			if(typeof this.options.spiderfyOnMaxZoom === 'boolean'){
+				if (bottomCluster._childCount <= maxSpidifiableCluster){
+					cluster.spiderfy();
+				} else {
+					this.fire('maxdensityreached', cluster);
+				}
+			} else if(
+				typeof this.options.spiderfyOnMaxZoom === 'number' &&
+				bottomCluster._childCount <= Math.min(
+					this.options.spiderfyOnMaxZoom,
+					maxSpidifiableCluster
+			)){
+				cluster.spiderfy();
+			} else {
+				this.fire('maxdensityreached', cluster);
+			}
 		} else if (this.options.zoomToBoundsOnClick) {
 			cluster.zoomToBounds();
 		}
