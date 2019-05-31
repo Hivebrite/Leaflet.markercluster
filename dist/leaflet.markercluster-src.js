@@ -1,5 +1,5 @@
 /*
- * Leaflet.markercluster 1.4.1+feature/density-spiderification-stopper.93bf540,
+ * Leaflet.markercluster 1.4.2-beta+feature/density-spiderification-stopper.8fa1df8,
  * Provides Beautiful Animated Marker Clustering functionality for Leaflet, a JS library for interactive maps.
  * https://github.com/Leaflet/Leaflet.markercluster
  * (c) 2012-2017, Dave Leaver, smartrak
@@ -94,22 +94,23 @@
 		},
 
 		addLayer: function (layer) {
+
 			if (layer instanceof L.LayerGroup) {
 				return this.addLayers([layer]);
-	    }
+			}
 
 			//Don't cluster non point data
 			if (!layer.getLatLng) {
 				this._nonPointGroup.addLayer(layer);
 				this.fire('layeradd', { layer: layer });
 				return this;
-	    }
+			}
 
 			if (!this._map) {
 				this._needsClustering.push(layer);
 				this.fire('layeradd', { layer: layer });
 				return this;
-	    }
+			}
 
 			if (this.hasLayer(layer)) {
 				return this;
@@ -117,9 +118,11 @@
 
 
 			//If we have already clustered we'll need to add this one to a cluster
+
 			if (this._unspiderfy) {
 				this._unspiderfy();
 			}
+
 			this._addLayer(layer, this._maxZoom);
 			this.fire('layeradd', { layer: layer });
 
@@ -203,23 +206,20 @@
 			if (!L.Util.isArray(layersArray)) {
 				return this.addLayer(layersArray);
 			}
+
 			var fg = this._featureGroup,
-			    npg = this._nonPointGroup,
-			    chunked = this.options.chunkedLoading,
-			    chunkInterval = this.options.chunkInterval,
-			    chunkProgress = this.options.chunkProgress,
-			    l = layersArray.length,
-			    offset = 0,
-			    originalArray = true,
-			    m;
+				npg = this._nonPointGroup,
+				chunked = this.options.chunkedLoading,
+				chunkInterval = this.options.chunkInterval,
+				chunkProgress = this.options.chunkProgress,
+				l = layersArray.length,
+				offset = 0,
+				originalArray = true,
+				m;
 
 			if (this._map) {
-
-	      console.log('has map');
-				// var started = (new Date()).getTime();
 				var started = Date.now();
 				var process = L.bind(function () {
-					// var start = (new Date()).getTime();
 					var start = Date.now();
 
 					// Make sure to unspiderfy before starting to add some layers
@@ -228,10 +228,8 @@
 					}
 
 					for (; offset < l; offset++) {
-	          console.log('a');
 						if (chunked && offset % 200 === 0) {
 							// every couple hundred markers, instrument the time elapsed since processing started:
-							// var elapsed = (new Date()).getTime() - start;
 							var elapsed = Date.now() - start;
 							if (elapsed > chunkInterval) {
 								break; // been working too hard, time to take a break :-)
@@ -265,9 +263,10 @@
 							continue;
 						}
 
-						if (this.hasLayer(m)) {
-							continue;
-						}
+						// Above code break performance on latest chrome
+						// if (this.hasLayer(m)) {
+						// 	continue;
+						// }
 
 						this._addLayer(m, this._maxZoom);
 						if (!skipLayerAddEvent) {
@@ -282,12 +281,10 @@
 								fg.removeLayer(otherMarker);
 							}
 						}
-	        }
+					}
 
-	        console.log('chunk takes ', Date.now() - start);
 					if (chunkProgress) {
 						// report progress and time elapsed:
-						// chunkProgress(offset, l, (new Date()).getTime() - started);
 						chunkProgress(offset, l, Date.now() - started);
 					}
 
@@ -329,9 +326,10 @@
 						continue;
 					}
 
-					if (this.hasLayer(m)) {
-						continue;
-					}
+					// Above code break performance on latest chrome
+					// if (this.hasLayer(m)) {
+					// 	continue;
+					// }
 
 					needsClustering.push(m);
 				}
@@ -813,6 +811,7 @@
 			}
 			return false;
 		},
+
 		//Override L.Evented.fire
 		fire: function (type, data, propagate) {
 			if (data && data.layer instanceof L.MarkerCluster) {
@@ -1474,7 +1473,7 @@
 				zoom = this._zoom + 1,
 				mapZoom = map.getZoom(),
 				i;
-	    console.warn(childClusters, boundsZoom, zoom, mapZoom);
+
 			//calculate how far we need to zoom down to see all of the markers
 			while (childClusters.length > 0 && boundsZoom > zoom) {
 				zoom++;
@@ -2147,36 +2146,28 @@
 			if (this._group._spiderfied === this || this._group._inZoomAnimation) {
 				return;
 			}
-	    console.log(21);
 
 			var childMarkers = this.getAllChildMarkers(null, true),
 				group = this._group,
 				map = group._map,
 				center = map.latLngToLayerPoint(this._latlng),
 				positions;
-	      console.log(22);
-	    this._group._unspiderfy();
-	    console.log(23);
+
+			this._group._unspiderfy();
 			this._group._spiderfied = this;
-	    console.log(24);
 
 			//TODO Maybe: childMarkers order by distance to center
 
 			if (this._group.options.spiderfyShapePositions) {
-	      console.log(25);
 				positions = this._group.options.spiderfyShapePositions(childMarkers.length, center);
 			} else if (childMarkers.length >= this._circleSpiralSwitchover) {
-	      console.log(26);
 				positions = this._generatePointsSpiral(childMarkers.length, center);
 			} else {
-	      console.log(27);
 				center.y += 10; // Otherwise circles look wrong => hack for standard blue icon, renders differently for other icons.
 				positions = this._generatePointsCircle(childMarkers.length, center);
 			}
-	    console.log(28);
-	    console.log(this._animationSpiderfy.toString());
-	    this._animationSpiderfy(childMarkers, positions);
-	    console.log(29);
+
+			this._animationSpiderfy(childMarkers, positions);
 		},
 
 		unspiderfy: function (zoomDetails) {
@@ -2280,6 +2271,7 @@
 				i, m, leg, newPos;
 
 			group._ignoreMove = true;
+
 			// Traverse in ascending order to make sure that inner circleMarkers are on top of further legs. Normal markers are re-ordered by newPosition.
 			// The reverse order trick no longer improves performance on modern browsers.
 			for (i = 0; i < childMarkers.length; i++) {
@@ -2343,8 +2335,9 @@
 				// Make sure we have a defined opacity.
 				legOptions.opacity = finalLegOpacity;
 			}
-	    console.log('a 217');
-	    group._ignoreMove = true;
+
+			group._ignoreMove = true;
+
 			// Add markers and spider legs to map, hidden at our center point.
 			// Traverse in ascending order to make sure that inner circleMarkers are on top of further legs. Normal markers are re-ordered by newPosition.
 			// The reverse order trick no longer improves performance on modern browsers.
@@ -2374,7 +2367,7 @@
 				if (m.clusterHide) {
 					m.clusterHide();
 				}
-
+				
 				// Vectors just get immediately added
 				fg.addLayer(m);
 
@@ -2382,7 +2375,6 @@
 					m._setPos(thisLayerPos);
 				}
 			}
-	    console.log('a 256');
 
 			group._forceLayout();
 			group._animationStart();
@@ -2395,7 +2387,7 @@
 				//Move marker to new position
 				m._preSpiderfyLatlng = m._latlng;
 				m.setLatLng(newPos);
-
+				
 				if (m.clusterShow) {
 					m.clusterShow();
 				}
